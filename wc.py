@@ -258,7 +258,8 @@ def wordcount():
 
 
 if __name__ == "__main__":
-	w = WordFrequencyCounter(None, config.FILE_NAME)
-	w.count_frequencies()
-	print w.get_frequency("alice")
+	# w = WordFrequencyCounter(None, config.FILE_NAME)
+	# w.count_frequencies()
+	# print w.get_frequency("alice")
+	app.run(host="0.0.0.0", debug=True, port=5000)
 

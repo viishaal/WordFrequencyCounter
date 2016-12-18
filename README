@@ -11,8 +11,6 @@ Running the server:
 			}
 
 
-
-
 Algorithm:
 	The WordFrequencyCounter initializes the file object if running in BATCH_MODE.
 	The execution and building of the wordcloud is handled by a number of threads. Work is allocated uniformly among all threads.
