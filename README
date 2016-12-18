@@ -1,0 +1,51 @@
+Algorithm:
+	The WordFrequencyCounter initializes the file object if running in BATCH_MODE.
+	The execution and building of the wordcloud is handled by a number of threads. Work is allocated uniformly among all threads.
+
+	API:
+		WordFrequencyCounter.count_frequencies()
+
+
+Configuration options (in file config.py):
+
+URL = "http://www.umich.edu/~umfandsf/other/ebooks/alice30.txt"
+	Use this variable is file is to be read from a remote URL
+
+FILE_NAME = "alice30.txt"
+	Use this variable if file is read from local file system
+
+NUMBER_THREADS = 4
+	default number of threads to run
+
+BATCH_MODE = True
+	Set this flag to true if the file is huge and would not fit in memory
+
+BATCH_SIZE = 1000
+	Set the batch size here when processing in batch mode
+
+LOWERCASE = True
+	Convert to lower case when processing batch
+
+
+Assumptions:
+	
+	Map Reduce:
+		Use either Hadoop or Spark for very very large files
+
+	Tokenization:
+		A better way to deal with punctuations etc could be to use NLTK's sentence tokenizers
+
+	Stop Words:
+		Stop words may be removed in the pre-processing step if we are interested in only representative words of that document.
+
+	Stemming:
+		Stemming could be done if we do not wish to count variations of root words separately.
+
+	Big hash tables:
+		Memory mapped hashtables is the right way to go if size of hashtables exceeds the available RAM space.
+
+	Thread synchronizations:
+		Locks are used currently to update entries in a global hashtables by multiple threads. A more efficient solution (but at cost of more storage) could be to use multiple local thread objects and merging these thread objects in the end (depending on the use case).
+
+
+
