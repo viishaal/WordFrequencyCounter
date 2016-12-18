@@ -6,6 +6,20 @@ import sys
 import time
 
 import config
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+app.config.from_object(__name__)
+
+# Load default config and override config from an environment variable
+# app.config.update(dict(
+# 	DATABASE=os.path.join(app.root_path, 'logs.db'),
+# 	SECRET_KEY='development key'
+# ))
+# app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+
+cached_objects = {}     ## cache of objects initalized
 
 
 class WordFrequencyCounter:
@@ -131,7 +145,7 @@ class WordFrequencyCounter:
 		start = time.time()
 		self.allocate_work()
 		self.intermediate_dicts = []  ## reset
-		
+
 		# start execution of each thread
 		for thread_idx in range(0, self.num_threads):
 			t = threading.Thread(target = self._worker_thread, args = (thread_idx + 1, ))
@@ -203,11 +217,48 @@ class WordFrequencyCounter:
 			sorted_list = sorted(self.frequency_dict.items(), key = operator.itemgetter(1), reverse=True)
 			return sorted_list
 		else:
-			return self.count_frequencies_batch()
+			self.frequency_dict = self.count_frequencies_batch()
+			return self.frequency_dict
 
+	def get_frequency(self, input_word):
+		""" counts frequencies of words in the given document
+
+		Args:
+			input_word whose frequency count is to be determined
+
+		Returns:
+			frequency of the input_word as found in self.frequency_dict
+
+		"""
+
+		if input_word not in self.frequency_dict:
+			return 0
+		else:
+			return self.frequency_dict[input_word]
+
+
+@app.route('/wordcount', methods=['GET', 'POST'])
+def wordcount():
+	start_time = time.time()
+	filename = request.args.get('filename', '')
+	input_word = request.args.get('foo', '')
+
+	result = {}
+	result["counts"] = []
+
+	if filename in cached_objects:
+		result["counts"].append(cached_objects[filename].get_frequency(input_word))
+	else:
+		wc = WordFrequencyCounter(None, filename)
+		wc.count_frequencies()
+		result["counts"].append(wc.get_frequency(input_word))
+		cached_objects[filename] = wc
+		
+	return jsonify(results = result["counts"])
 
 
 if __name__ == "__main__":
 	w = WordFrequencyCounter(None, config.FILE_NAME)
-	print w.count_frequencies()
+	w.count_frequencies()
+	print w.get_frequency("alice")
 

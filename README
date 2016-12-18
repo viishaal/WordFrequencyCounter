@@ -1,3 +1,18 @@
+Running the server:
+	export FLASK_APP=wc.py
+	flask run
+
+	Sample output:
+		curl "http://127.0.0.1:5000/wordcount?filename=alice30.txt&foo=alice"
+			{
+			  "results": [
+			    386
+			  ]
+			}
+
+
+
+
 Algorithm:
 	The WordFrequencyCounter initializes the file object if running in BATCH_MODE.
 	The execution and building of the wordcloud is handled by a number of threads. Work is allocated uniformly among all threads.
